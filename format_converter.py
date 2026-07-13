@@ -74,7 +74,7 @@ def convert_to_standard_schema(kalman_input_path, out_path):
 
 
 if __name__ == "__main__":
-    if os.path.exists(OUT_KALMAN_PRED):
-        convert_to_standard_schema(OUT_KALMAN_PRED, OUT_STANDARD_JSON)
+    if os.path.exists(OUT_GRU_PRED):
+        convert_to_standard_schema(OUT_GRU_PRED, OUT_STANDARD_JSON)
     else:
         print("错误：缺少卡尔曼预测输出文件，请先运行预测流程")

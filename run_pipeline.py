@@ -13,13 +13,13 @@ def main():
     from trajectory_dataset import build_trajectory_dataset
     traj_ds = build_trajectory_dataset(df_aligned)
     # 3. 卡尔曼平滑+批量路径预测
-    from kalman_predictor import batch_predict
+    from GRU_predictor_fixed import batch_predict
     pred_result = batch_predict(traj_ds)
     # 4. 转换为标准schema JSON
     from format_converter import convert_to_standard_schema
-    convert_to_standard_schema(OUT_KALMAN_PRED, OUT_STANDARD_JSON)
+    convert_to_standard_schema(OUT_GRU_PRED, OUT_STANDARD_JSON)
     # 5. 生成可视化视频
-    from video_visualizer import render_visual_video
+    from video_visualizer_fixed import render_visual_video
     render_visual_video()
 
     print("\n===== Pipeline全部执行完成，输出文件清单 =====")

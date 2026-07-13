@@ -65,11 +65,12 @@ INPUT_SEQ_CSV = "inputs/sequence_split_recommendation.csv"
 INPUT_VIDEO = "inputs/adl-01-cam0.mp4"
 
 # 输出路径
-OUT_DIR = "outputs/"
+OUT_DIR = "outputs_test/"
 OUT_ALIGNED_CSV = OUT_DIR + "module1_aligned.csv"
 OUT_FRAME_MAP_JSON = OUT_DIR + "module1_frame_map.json"
 OUT_TRAJ_DATASET = OUT_DIR + "module2_traj_dataset.json"
 OUT_KALMAN_PRED = OUT_DIR + "module3_predict_result.json"
+OUT_GRU_PRED = OUT_DIR + "module3_GRU_predict_result.json"
 OUT_ERROR_CSV = OUT_DIR + "pred_error_stat.csv"
 OUT_STANDARD_JSON = OUT_DIR + "standard_pred_output.json"
 OUT_VIS_VIDEO = OUT_DIR + "prediction_visual.mp4"
