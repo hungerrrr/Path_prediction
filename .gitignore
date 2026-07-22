@@ -1,1 +1,12 @@
-/data/processed/aligned_keypoints.csv
+/data/processed/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+.agents/
+.venv/
+venv/
+.DS_Store
+Thumbs.db
+*.zip
+/outputs/

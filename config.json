@@ -1,0 +1,7 @@
+{
+  "modules": {
+    "path_prediction": {
+      "enabled": true
+    }
+  }
+}

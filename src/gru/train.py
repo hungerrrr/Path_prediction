@@ -119,11 +119,11 @@ def main() -> None:
     test_data = NpzTrajectoryDataset(args.dataset_dir / "test.npz", scale)
     if not len(train_data):
         raise RuntimeError(
-            "training split contains no windows; check data coverage and window lengths"
+            "训练集没有可用窗口，请检查数据覆盖范围和窗口长度"
         )
     if not len(val_data):
         raise RuntimeError(
-            "validation split contains no windows; do not select a model on training data"
+            "验证集没有可用窗口，请勿仅依据训练数据选择模型"
         )
 
     generator = torch.Generator().manual_seed(args.seed)
@@ -148,7 +148,7 @@ def main() -> None:
             replacement=True,
             generator=generator,
         )
-        print(f"Dataset sampling weights: {source_weights}")
+        print(f"数据集采样权重：{source_weights}")
     train_loader = DataLoader(
         train_data,
         batch_size=args.batch_size,

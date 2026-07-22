@@ -68,13 +68,13 @@ def render_visual_video(
 
     capture = cv2.VideoCapture(str(video_path))
     if not capture.isOpened():
-        raise FileNotFoundError(f"cannot open video: {video_path}")
+        raise FileNotFoundError(f"无法打开视频：{video_path}")
     fps = capture.get(cv2.CAP_PROP_FPS) or 30.0
     width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
     if width <= 0 or height <= 0:
         capture.release()
-        raise RuntimeError(f"invalid video dimensions: {video_path}")
+        raise RuntimeError(f"视频尺寸无效：{video_path}")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     writer = cv2.VideoWriter(
         str(output_path),
@@ -84,7 +84,7 @@ def render_visual_video(
     )
     if not writer.isOpened():
         capture.release()
-        raise RuntimeError(f"cannot create output video: {output_path}")
+        raise RuntimeError(f"无法创建输出视频：{output_path}")
 
     history: dict[str, list[tuple[int, int]]] = defaultdict(list)
     frame_index = 0
@@ -128,9 +128,9 @@ def render_visual_video(
 
     capture.release()
     writer.release()
-    print(f"Visualization video: {output_path.resolve()}")
+    print(f"可视化视频：{output_path.resolve()}")
     return output_path
 
 
 if __name__ == "__main__":
-    raise SystemExit("Use predict.py --video <path>; visualization is intentionally optional.")
+    raise SystemExit("请通过 predict.py --video <视频路径> 生成可选的可视化结果。")

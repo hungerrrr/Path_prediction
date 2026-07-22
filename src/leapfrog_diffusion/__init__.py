@@ -1,1 +1,1 @@
-"""Scheme B: Leapfrog conditional diffusion predictor."""
+"""方案 B：Leapfrog 条件扩散预测包。"""

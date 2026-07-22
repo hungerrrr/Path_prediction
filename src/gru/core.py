@@ -19,7 +19,6 @@ SEQUENCE_RE = re.compile(r"(?P<sequence>(?:adl|fall)-\d+)", re.IGNORECASE)
 PREVFALL_RE = re.compile(r"(.+?)_(\d+)_keypoints$", re.IGNORECASE)
 # 计算人体中心所需的最小字段集合。
 REQUIRED_COLUMNS = {
-    "frame_id",
     "nosex",
     "nosey",
     "midhipx",
@@ -191,7 +190,9 @@ def standardize_keypoints(
 
     missing = sorted(REQUIRED_COLUMNS.difference(raw.columns))
     if missing:
-        raise ValueError(f"missing required columns: {', '.join(missing)}")
+        raise ValueError(f"缺少必要字段：{', '.join(missing)}")
+    if "frame_index" not in raw.columns and "frame_id" not in raw.columns:
+        raise ValueError("缺少必要字段 frame_index（或兼容字段 frame_id）")
 
     df = raw.copy()
     sequence_from_file = extract_sequence_id(source_path.name)
@@ -203,12 +204,13 @@ def standardize_keypoints(
         sequence_values = sequence_values.fillna(sequence_from_file)
     df["sequence_id"] = sequence_values
     if df["sequence_id"].isna().any():
-        raise ValueError("cannot determine sequence id from source_id or filename")
+        raise ValueError("无法从 source_id 或文件名确定序列 ID")
     if "dataset_source" not in df:
         df["dataset_source"] = source_path.parent.name.replace("_89", "")
     df["dataset_source"] = df["dataset_source"].astype(str).str.strip()
 
-    df["frame_index"] = pd.to_numeric(df["frame_id"], errors="coerce")
+    frame_column = "frame_index" if "frame_index" in df.columns else "frame_id"
+    df["frame_index"] = pd.to_numeric(df[frame_column], errors="coerce")
     if "video_person_id" not in df:
         df["video_person_id"] = 1
     df["person_id"] = df["video_person_id"].fillna(1).astype(str).map(lambda x: f"person_{x}")
@@ -248,6 +250,12 @@ def standardize_keypoints(
         )
         df.loc[indices, y_cols] = df.loc[indices, y_cols] / source_height * config.canvas_height
         df.loc[indices, "source_fps"] = SOURCE_FPS.get(source_key, config.fps)
+    if "timestamp_sec" in df.columns:
+        df["timestamp_sec"] = pd.to_numeric(df["timestamp_sec"], errors="coerce")
+    else:
+        df["timestamp_sec"] = np.nan
+    derived_timestamp = df["frame_index"] / df["source_fps"]
+    df["timestamp_sec"] = df["timestamp_sec"].fillna(derived_timestamp)
     df[x_cols] = df[x_cols].clip(0, config.canvas_width - 1)
     df[y_cols] = df[y_cols].clip(0, config.canvas_height - 1)
 
@@ -276,7 +284,7 @@ def standardize_keypoints(
     df["frame_index"] = df["frame_index"].astype(int)
     df["source_file"] = str(source_path.resolve())
     keep = [
-        "dataset_source", "sequence_id", "person_id", "frame_index", "source_fps", "label_name",
+        "dataset_source", "sequence_id", "person_id", "frame_index", "timestamp_sec", "source_fps", "label_name",
         "pose_center_weight", "human_center_x", "human_center_y",
         "bbox_xmin", "bbox_ymin", "bbox_xmax", "bbox_ymax", "source_file",
     ]

@@ -44,7 +44,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fps", type=float, default=30.0)
     parser.add_argument("--obs-seconds", type=float, default=2.0)
     parser.add_argument("--pred-seconds", type=float, default=3.0)
-    parser.add_argument("--stride", type=int, default=5, help="Window step in frames")
+    parser.add_argument("--stride", type=int, default=5, help="滑动窗口步长（帧）")
     parser.add_argument(
         "--min-future-seconds",
         type=float,
@@ -70,7 +70,7 @@ def main() -> None:
 
     args = parse_args()
     if args.stride < 1:
-        raise ValueError("--stride must be at least 1")
+        raise ValueError("--stride 不能小于 1")
     config = DataConfig(fps=args.fps, obs_seconds=args.obs_seconds, pred_seconds=args.pred_seconds)
     # 划分表优先使用“数据源 + 组编号”，兼容仅提供序列号的旧格式。
     split_df = pd.read_csv(args.split_file, encoding="utf-8-sig")
@@ -78,14 +78,14 @@ def main() -> None:
         columns={column: column.strip().lower() for column in split_df.columns}
     )
     if not {"split"}.issubset(split_df.columns):
-        raise ValueError("split file must contain a split column")
+        raise ValueError("数据划分文件必须包含 split 字段")
     invalid = sorted(set(split_df["split"]) - {"train", "val", "test"})
     if invalid:
-        raise ValueError(f"unsupported split values: {invalid}")
+        raise ValueError(f"不支持的数据划分值：{invalid}")
     group_split = {"dataset_source", "group_id"}.issubset(split_df.columns)
     sequence_split = "sequence" in split_df.columns
     if not group_split and not sequence_split:
-        raise ValueError("split file must contain dataset_source + group_id, or Sequence")
+        raise ValueError("数据划分文件必须包含 dataset_source 与 group_id，或包含 Sequence")
     if group_split:
         split_map = {
             (
@@ -103,7 +103,7 @@ def main() -> None:
     # 大型 CSV 按块处理，避免一次性加载全部原始数据。
     files = discover_keypoint_files(args.data_root)
     if not files:
-        raise FileNotFoundError(f"no keypoint tables found below {args.data_root}")
+        raise FileNotFoundError(f"未在 {args.data_root} 下找到骨架表")
     frames, skipped, unknown_keys = [], [], set()
     for path in files:
         try:
@@ -148,7 +148,7 @@ def main() -> None:
             skipped.append({"file": str(path), "reason": str(exc)})
 
     if not frames:
-        raise RuntimeError("no usable keypoint rows matched the recommended split")
+        raise RuntimeError("没有可用骨架记录匹配推荐的数据划分")
     # 合并后再次去重，保证同一人物同一帧只保留最后一条记录。
     all_frames = pd.concat(frames, ignore_index=True).drop_duplicates(
         ["dataset_source", "sequence_id", "person_id", "frame_index"], keep="last"
@@ -227,7 +227,7 @@ def main() -> None:
     if missing_sequences:
         print(f"  split sequences without data: {len(missing_sequences)}")
         if args.strict:
-            raise RuntimeError("strict mode: some recommended split sequences have no data")
+            raise RuntimeError("严格模式：推荐划分中的部分序列没有数据")
 
 
 if __name__ == "__main__":

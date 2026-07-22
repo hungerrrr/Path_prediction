@@ -242,10 +242,7 @@ def run_prediction(
             ]
             frame_record = {
                 "frame_index": int(row["frame_index"]),
-                "timestamp_sec": round(
-                    int(row["frame_index"]) / config.fps,
-                    4,
-                ),
+                "timestamp_sec": round(float(row["timestamp_sec"]), 4),
                 "person_id": row["person_id"],
                 "current_position": anchor[0].tolist(),
                 "predicted_path": best_path.tolist(),

@@ -11,19 +11,28 @@ import numpy as np
 import pandas as pd
 import torch
 
-from core import (
-    DataConfig,
-    load_checkpoint,
-    read_table,
-    split_contiguous_tracks,
-    standardize_keypoints,
-)
+try:
+    from .core import (
+        DataConfig,
+        load_checkpoint,
+        read_table,
+        split_contiguous_tracks,
+        standardize_keypoints,
+    )
+except ImportError:  # 兼容 python src/gru/predict.py 直接运行
+    from core import (
+        DataConfig,
+        load_checkpoint,
+        read_table,
+        split_contiguous_tracks,
+        standardize_keypoints,
+    )
 
 
 def parse_args() -> argparse.Namespace:
     """解析预测输入、模型、设备和可视化参数。"""
 
-    parser = argparse.ArgumentParser(description="Predict paths with a trained model.")
+    parser = argparse.ArgumentParser(description="使用已训练模型执行路径预测。")
     parser.add_argument(
         "--keypoints",
         type=Path,
@@ -37,8 +46,21 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="可选的原始视频；省略时不生成可视化视频",
     )
-    parser.add_argument("--video-out", type=Path, help="Optional output video path")
+    parser.add_argument("--video-out", type=Path, help="可选的输出视频路径")
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
+    parser.add_argument(
+        "--confidence-samples",
+        type=int,
+        default=16,
+        help="用于逐轨迹不确定性估计的 MC Dropout 采样次数",
+    )
+    parser.add_argument(
+        "--confidence-scale-px",
+        type=float,
+        default=100.0,
+        help="将预计像素误差映射到 [0,1] 置信度的尺度",
+    )
+    parser.add_argument("--confidence-seed", type=int, default=42)
     return parser.parse_args()
 
 
@@ -57,7 +79,7 @@ def corridor(
     boxes.extend(
         [
             [x - body_w / 2, y - body_h / 2, x + body_w / 2, y + body_h / 2]
-            for x, y in path
+            for x, y in np.asarray(path).reshape(-1, 2)
         ]
     )
     values = np.asarray(boxes)
@@ -84,12 +106,71 @@ def infer_video_name(keypoints: Path) -> str:
     return f"{stem}.mp4"
 
 
+def trajectory_confidence(
+    validation_ade_px: float,
+    epistemic_std_px: float,
+    observation_count: int,
+    observation_frames: int,
+    confidence_scale_px: float,
+) -> tuple[float, dict]:
+    """将模型误差、当前样本不确定性和历史完整度校准为逐轨迹分数。"""
+
+    if confidence_scale_px <= 0:
+        raise ValueError("confidence_scale_px 必须大于 0")
+    coverage = float(np.clip(observation_count / observation_frames, 0.0, 1.0))
+    estimated_ade = float(math.hypot(validation_ade_px, epistemic_std_px))
+    error_score = math.exp(-estimated_ade / confidence_scale_px)
+    # 历史不足时仍给出模型预测，但明确降低其可信程度。
+    history_factor = 0.25 + 0.75 * coverage
+    confidence = float(np.clip(error_score * history_factor, 0.0, 1.0))
+    details = {
+        "method": "mc_dropout_ade_v1",
+        "validation_ade_px": round(validation_ade_px, 6),
+        "epistemic_std_px": round(epistemic_std_px, 6),
+        "estimated_ade_px": round(estimated_ade, 6),
+        "observation_coverage": round(coverage, 6),
+        "confidence_scale_px": round(confidence_scale_px, 6),
+    }
+    return round(confidence, 6), details
+
+
+def predict_with_uncertainty(
+    model: torch.nn.Module,
+    model_input: torch.Tensor,
+    scale: np.ndarray,
+    sample_count: int,
+) -> tuple[np.ndarray, np.ndarray, float]:
+    """返回确定性主轨迹、MC Dropout 样本和像素空间离散度。"""
+
+    if sample_count < 2:
+        raise ValueError("confidence_samples 不能小于 2")
+    model.eval()
+    with torch.no_grad():
+        deterministic = model(model_input).squeeze(0).cpu().numpy()
+        model.train()
+        samples = np.stack(
+            [model(model_input).squeeze(0).cpu().numpy() for _ in range(sample_count)],
+            axis=0,
+        )
+        model.eval()
+    samples_px = samples * scale[None, None, :]
+    mean_px = samples_px.mean(axis=0, keepdims=True)
+    radial_variance = np.sum(np.square(samples_px - mean_px), axis=-1)
+    epistemic_std_px = float(np.sqrt(np.mean(radial_variance)))
+    return deterministic, samples, epistemic_std_px
+
+
 def main() -> None:
     """完成关键点对齐、逐帧推理、结果导出和可选视频渲染。"""
 
     args = parse_args()
+    if args.confidence_samples < 2:
+        raise ValueError("--confidence-samples 不能小于 2")
+    if args.confidence_scale_px <= 0:
+        raise ValueError("--confidence-scale-px 必须大于 0")
+    torch.manual_seed(args.confidence_seed)
     if args.device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA was requested but is unavailable")
+        raise RuntimeError("已指定 CUDA，但当前环境不可用")
     use_cuda = args.device == "cuda" or (
         args.device == "auto" and torch.cuda.is_available()
     )
@@ -115,7 +196,6 @@ def main() -> None:
         json.dump(frame_map, handle, ensure_ascii=False, indent=2)
 
     validation_ade = float(checkpoint.get("validation_metrics", {}).get("ade_pixel", 50.0))
-    confidence = round(float(math.exp(-validation_ade / 100.0)), 3)
     raw_samples, standard_frames, errors = [], [], []
 
     # 每个连续人物轨迹独立推理，避免跨人物或跨缺帧片段拼接历史。
@@ -139,14 +219,38 @@ def main() -> None:
                 padded = obs
             normalized = (padded - padded[-1:]) / scale
             # 模型输出的是相对位移，需要乘尺度后加回最后一个观测点。
-            with torch.no_grad():
-                model_input = torch.from_numpy(normalized).unsqueeze(0).to(device)
-                output = model(model_input).squeeze(0).cpu().numpy()
+            model_input = torch.from_numpy(normalized).unsqueeze(0).to(device)
+            output, mc_outputs, epistemic_std_px = predict_with_uncertainty(
+                model,
+                model_input,
+                scale,
+                args.confidence_samples,
+            )
             predicted = padded[-1:] + output * scale
             predicted[:, 0] = np.clip(predicted[:, 0], 0, config.canvas_width - 1)
             predicted[:, 1] = np.clip(predicted[:, 1], 0, config.canvas_height - 1)
+            mc_predicted = padded[-1:, None] + mc_outputs * scale[None, None, :]
+            mc_predicted[..., 0] = np.clip(
+                mc_predicted[..., 0], 0, config.canvas_width - 1
+            )
+            mc_predicted[..., 1] = np.clip(
+                mc_predicted[..., 1], 0, config.canvas_height - 1
+            )
             row = track.iloc[index]
-            poly = corridor(predicted, bboxes[index], config.canvas_width, config.canvas_height)
+            corridor_paths = np.concatenate(
+                [predicted[None], mc_predicted], axis=0
+            )
+            poly = corridor(
+                corridor_paths, bboxes[index], config.canvas_width, config.canvas_height
+            )
+            confidence, confidence_details = trajectory_confidence(
+                validation_ade,
+                epistemic_std_px,
+                len(obs),
+                config.obs_frames,
+                args.confidence_scale_px,
+            )
+            confidence_details["mc_samples"] = args.confidence_samples
             truth = centers[index + 1:index + 1 + config.pred_frames]
             mse = None
             if len(truth) == config.pred_frames:
@@ -169,15 +273,18 @@ def main() -> None:
                 "obs_smooth": obs.tolist(),
                 "predict_path": predicted.tolist(),
                 "path_corridor": poly,
+                "path_confidence": confidence,
+                "confidence_details": confidence_details,
                 "true_future": truth.tolist(), "pixel_mse": None if mse is None else round(mse, 3),
             })
             standard_frames.append({
                 "frame_index": int(row["frame_index"]),
-                "timestamp_sec": round(int(row["frame_index"]) / config.fps, 4),
+                "timestamp_sec": round(float(row["timestamp_sec"]), 4),
                 "person_id": row["person_id"], "current_position": padded[-1].tolist(),
                 "predicted_path": predicted.tolist(),
                 "path_corridor": poly,
                 "confidence": confidence,
+                "confidence_details": confidence_details,
             })
 
     standard_frames.sort(key=lambda item: (item["frame_index"], item["person_id"]))
@@ -197,6 +304,9 @@ def main() -> None:
         "source_dataset": str(args.keypoints.resolve()),
         "predict_method": "GRU relative-displacement v2",
         "fps": config.fps, "obs_sec": config.obs_seconds, "pred_sec": config.pred_seconds,
+        "confidence_method": "mc_dropout_ade_v1",
+        "confidence_samples": args.confidence_samples,
+        "confidence_scale_px": args.confidence_scale_px,
         "avg_pixel_mse": average_mse,
         "sample_count": len(raw_samples),
         "predict_samples": raw_samples,
@@ -214,6 +324,7 @@ def main() -> None:
             "current_position": json.dumps(item["current_position"]),
             "predicted_path": json.dumps(item["predicted_path"]),
             "path_corridor": json.dumps(item["path_corridor"]),
+            "confidence_details": json.dumps(item["confidence_details"]),
         }
         for item in standard_frames
     ]
@@ -230,16 +341,16 @@ def main() -> None:
         index=False,
         encoding="utf-8-sig",
     )
-    print(f"Prediction outputs: {args.output_dir.resolve()}")
+    print(f"预测结果目录：{args.output_dir.resolve()}")
 
     if args.video:
         if not args.video.is_file():
-            raise FileNotFoundError(f"video does not exist: {args.video}")
+            raise FileNotFoundError(f"视频文件不存在：{args.video}")
         from video_visualizer import render_visual_video
         video_out = args.video_out or args.output_dir / "prediction_visual.mp4"
         render_visual_video(args.video, args.output_dir / "standard_pred_output.json", video_out)
     else:
-        print("No --video supplied; skipped visualization.")
+        print("未提供 --video，已跳过可视化。")
 
 
 if __name__ == "__main__":

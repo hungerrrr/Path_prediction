@@ -1,1 +1,1 @@
-"""Scheme A: low-rank multimodal EigenTrajectory Transformer."""
+"""方案 A：低秩多模态 EigenTrajectory Transformer。"""

@@ -1,1 +1,1 @@
-"""Original GRU trajectory prediction package."""
+"""基础 GRU 轨迹预测包。"""
