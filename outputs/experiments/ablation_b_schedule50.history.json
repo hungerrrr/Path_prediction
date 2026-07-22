@@ -1,0 +1,16 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 1.086034793406725,
+    "noise_loss": 1.0507611948996782,
+    "initializer_loss": 0.07054718802100979,
+    "validation_initializer_loss": 0.08385816316457154
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.3842024840414524,
+    "noise_loss": 0.47890394646674395,
+    "initializer_loss": -0.18940291902981699,
+    "validation_initializer_loss": 0.04158607081519274
+  }
+]

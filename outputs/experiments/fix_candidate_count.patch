@@ -1,0 +1,19 @@
+diff --git a/src/advanced_prediction.py b/src/advanced_prediction.py
+--- a/src/advanced_prediction.py
++++ b/src/advanced_prediction.py
+@@ -190,6 +190,7 @@ def run_prediction(
+     samples = []
+     standard_frames = []
+     errors = []
++    candidate_count = 0
+     for track in split_contiguous_tracks(aligned):
+         centers = track[["human_center_x", "human_center_y"]].to_numpy(
+             np.float32
+@@ -222,6 +223,7 @@ def run_prediction(
+                 device,
+                 num_samples,
+             )
++            candidate_count = int(len(candidate_paths))
+             candidate_paths = anchor[None] + candidate_paths * scale
+             candidate_paths[..., 0] = np.clip(
+                 candidate_paths[..., 0],

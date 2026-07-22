@@ -1,0 +1,46 @@
+{
+  "schema_version": "aligned_keypoints.v3",
+  "source_root": "D:\\Project\\挑战杯项目材料\\datasetcsv\\datasetcsv",
+  "split_file": "D:\\Project\\挑战杯项目材料\\datasetcsv\\datasetcsv\\splits\\recommended_group_split.csv",
+  "output_file": "D:\\Project\\Path_prediction_clean\\data\\processed\\aligned_keypoints.csv",
+  "config": {
+    "canvas_width": 640,
+    "canvas_height": 240,
+    "x_offset": 320.0,
+    "default_fps": 30.0,
+    "min_center_weight": 1.0
+  },
+  "input_rows_by_file": {
+    "harup_keypoints.csv": 545500,
+    "lei2fall_keypoints.csv": 37731,
+    "mmfall_keypoints.csv": 187940,
+    "prevfall_keypoints_standard.csv": 22557,
+    "urfall_keypoints.csv": 12555
+  },
+  "output_rows_by_file": {
+    "harup_keypoints.csv": 545500,
+    "lei2fall_keypoints.csv": 37731,
+    "mmfall_keypoints.csv": 187940,
+    "prevfall_keypoints_standard.csv": 22557,
+    "urfall_keypoints.csv": 12555
+  },
+  "split_rows": {
+    "train": 566530,
+    "test": 119781,
+    "val": 119972
+  },
+  "center_methods": {
+    "weighted_keypoints": 686763,
+    "bbox_fallback": 119520
+  },
+  "preserved_fields": {
+    "metadata": 7,
+    "body25_coordinates": 50,
+    "derived_vectors": 32,
+    "identity_fields": [
+      "video_person_id",
+      "global_person_id",
+      "person_id"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+Epoch 001 | train 0.199252 | val 0.144279 | Top1 ADE 14.71px | minADE@6 11.03px
+Epoch 002 | train 0.142402 | val 0.118121 | Top1 ADE 15.05px | minADE@6 11.89px
+Epoch 003 | train 0.123455 | val 0.114393 | Top1 ADE 14.79px | minADE@6 11.87px
+Epoch 004 | train 0.129325 | val 0.122671 | Top1 ADE 14.98px | minADE@6 11.89px
+Epoch 005 | train 0.141292 | val 0.289062 | Top1 ADE 26.97px | minADE@6 22.05px
+Epoch 006 | train 0.279093 | val 0.349387 | Top1 ADE 18.57px | minADE@6 14.51px
+Epoch 007 | train 0.276211 | val 0.316552 | Top1 ADE 15.48px | minADE@6 13.61px
+Epoch 008 | train 0.264198 | val 0.191659 | Top1 ADE 14.87px | minADE@6 11.83px
+Epoch 009 | train 0.198763 | val 0.138037 | Top1 ADE 15.12px | minADE@6 12.98px

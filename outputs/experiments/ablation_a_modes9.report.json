@@ -1,0 +1,20 @@
+{
+  "best_epoch": 2,
+  "validation": {
+    "epoch": 2,
+    "train_loss": 0.39404199086129665,
+    "selection_score": 61.6238694190979,
+    "loss": 0.3954504579305649,
+    "top1_ade_pixel": 31.26125931739807,
+    "top1_fde_pixel": 44.14226579666138,
+    "min_ade_pixel": 30.36261010169983,
+    "min_fde_pixel": 21.610748291015625
+  },
+  "test": {
+    "loss": 0.39284028112888336,
+    "top1_ade_pixel": 31.23475742340088,
+    "top1_fde_pixel": 45.153438568115234,
+    "min_ade_pixel": 30.27415370941162,
+    "min_fde_pixel": 23.51862335205078
+  }
+}

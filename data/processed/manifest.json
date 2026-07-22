@@ -1,0 +1,107 @@
+{
+  "schema_version": "trajectory_dataset.v2",
+  "data_config": {
+    "fps": 30.0,
+    "obs_seconds": 2.0,
+    "pred_seconds": 3.0,
+    "canvas_width": 640,
+    "canvas_height": 240,
+    "x_offset": 320.0,
+    "coordinate_scale": 0.5,
+    "obs_frames": 60,
+    "pred_frames": 90
+  },
+  "normalization": {
+    "type": "relative_to_last_observation",
+    "scale": [
+      320.0,
+      240.0
+    ]
+  },
+  "source_geometry": {
+    "har-up": [
+      640.0,
+      480.0
+    ],
+    "lei2fall": [
+      320.0,
+      240.0
+    ],
+    "mmfall": [
+      320.0,
+      180.0
+    ],
+    "pre-vfall": [
+      2560.0,
+      1440.0
+    ],
+    "urfall": [
+      640.0,
+      480.0
+    ]
+  },
+  "source_fps": {
+    "har-up": 18.0,
+    "lei2fall": 25.0,
+    "mmfall": 30.0,
+    "pre-vfall": 30.0,
+    "urfall": 30.0
+  },
+  "target_fps": 30.0,
+  "stride": 5,
+  "min_future_seconds": 0.5,
+  "min_center_weight": 1.0,
+  "source_files": 5,
+  "matched_sequences": 2100,
+  "missing_sequences": [
+    "har-up::har-up_subject12_activity11_trial1_camera1",
+    "har-up::har-up_subject2_activity11_trial2_camera1",
+    "har-up::har-up_subject4_activity11_trial2_camera1",
+    "har-up::har-up_subject4_activity11_trial3_camera1",
+    "har-up::har-up_subject4_activity4_trial1_camera1",
+    "lei2fall::lei2fall_coffee_room_01_video_37",
+    "mmfall::mmfall_2023-05-12-15-36-36",
+    "mmfall::mmfall_2023-05-13-15-01-41",
+    "mmfall::mmfall_2023-05-13-15-04-14",
+    "mmfall::mmfall_2023-05-13-15-06-03",
+    "mmfall::mmfall_2023-05-13-15-08-12",
+    "mmfall::mmfall_2023-05-13-15-08-51",
+    "mmfall::mmfall_2023-05-14-19-24-20",
+    "mmfall::mmfall_2023-05-14-19-55-41",
+    "mmfall::mmfall_2023-05-14-19-56-31",
+    "mmfall::mmfall_2023-05-16-14-36-57",
+    "mmfall::mmfall_2023-06-12-16-35-05",
+    "mmfall::mmfall_2023-06-12-16-37-53",
+    "mmfall::mmfall_2023-06-20-16-50-25",
+    "mmfall::mmfall_2023-06-20-16-52-07",
+    "mmfall::mmfall_2023-06-20-16-54-07",
+    "mmfall::mmfall_2023-06-20-16-56-30",
+    "mmfall::mmfall_2023-06-20-20-31-20",
+    "mmfall::mmfall_2023-06-20-20-36-18",
+    "mmfall::mmfall_2023-06-20-20-41-56",
+    "mmfall::mmfall_2023-06-20-20-43-42",
+    "mmfall::mmfall_2023-06-20-20-45-08",
+    "mmfall::mmfall_2023-06-20-20-47-49",
+    "mmfall::mmfall_2023-06-20-20-48-42",
+    "mmfall::mmfall_2023-06-20-20-49-46"
+  ],
+  "unknown_data_groups": [],
+  "skipped_files": [],
+  "splits": {
+    "train": {
+      "sequences": 1321,
+      "frames": 494259,
+      "windows": 112350
+    },
+    "val": {
+      "sequences": 389,
+      "frames": 97797,
+      "windows": 19952
+    },
+    "test": {
+      "sequences": 390,
+      "frames": 94707,
+      "windows": 18539
+    }
+  }
+}

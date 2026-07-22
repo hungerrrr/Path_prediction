@@ -1,0 +1,156 @@
+{
+  "dataset": "D:\\Project\\Path_prediction_clean\\outputs\\experiments\\ablation_dataset",
+  "training_budget_epochs": 2,
+  "variants": {
+    "baseline": {
+      "best_epoch": 2,
+      "validation": {
+        "epoch": 2,
+        "train_loss": 0.3394496962428093,
+        "selection_score": 41.02567636966705,
+        "loss": 0.3246164545416832,
+        "top1_ade_pixel": 21.226569652557373,
+        "top1_fde_pixel": 24.914154767990112,
+        "min_ade_pixel": 19.79910671710968,
+        "min_fde_pixel": 22.139782428741455
+      },
+      "test": {
+        "loss": 0.3292689174413681,
+        "top1_ade_pixel": 21.6617431640625,
+        "top1_fde_pixel": 26.61384391784668,
+        "min_ade_pixel": 20.167250633239746,
+        "min_fde_pixel": 23.75067901611328
+      }
+    },
+    "rank8": {
+      "best_epoch": 1,
+      "validation": {
+        "epoch": 1,
+        "train_loss": 0.36149506736546755,
+        "selection_score": 33.24779808521271,
+        "loss": 0.378498911857605,
+        "top1_ade_pixel": 17.584617376327515,
+        "top1_fde_pixel": 23.90700662136078,
+        "min_ade_pixel": 15.663180708885193,
+        "min_fde_pixel": 20.30145835876465
+      },
+      "test": {
+        "loss": 0.3790474683046341,
+        "top1_ade_pixel": 18.20054817199707,
+        "top1_fde_pixel": 25.534849166870117,
+        "min_ade_pixel": 16.261388301849365,
+        "min_fde_pixel": 21.6817045211792
+      }
+    },
+    "rank32": {
+      "best_epoch": 2,
+      "validation": {
+        "epoch": 2,
+        "train_loss": 0.31727226451039314,
+        "selection_score": 52.27245903015137,
+        "loss": 0.24641739577054977,
+        "top1_ade_pixel": 26.24839758872986,
+        "top1_fde_pixel": 33.48379635810852,
+        "min_ade_pixel": 26.02406144142151,
+        "min_fde_pixel": 28.518122911453247
+      },
+      "test": {
+        "loss": 0.24984949827194214,
+        "top1_ade_pixel": 26.88746929168701,
+        "top1_fde_pixel": 35.094120025634766,
+        "min_ade_pixel": 26.651474952697754,
+        "min_fde_pixel": 29.878074645996094
+      }
+    },
+    "modes3": {
+      "best_epoch": 2,
+      "validation": {
+        "epoch": 2,
+        "train_loss": 0.2188745839521289,
+        "selection_score": 56.176493406295776,
+        "loss": 0.2259331587702036,
+        "top1_ade_pixel": 28.520511865615845,
+        "top1_fde_pixel": 25.281263828277588,
+        "min_ade_pixel": 27.65598154067993,
+        "min_fde_pixel": 22.14528489112854
+      },
+      "test": {
+        "loss": 0.22599703818559647,
+        "top1_ade_pixel": 28.87050151824951,
+        "top1_fde_pixel": 28.084667205810547,
+        "min_ade_pixel": 27.808838844299316,
+        "min_fde_pixel": 24.89501953125
+      }
+    },
+    "modes9": {
+      "best_epoch": 2,
+      "validation": {
+        "epoch": 2,
+        "train_loss": 0.39404199086129665,
+        "selection_score": 61.6238694190979,
+        "loss": 0.3954504579305649,
+        "top1_ade_pixel": 31.26125931739807,
+        "top1_fde_pixel": 44.14226579666138,
+        "min_ade_pixel": 30.36261010169983,
+        "min_fde_pixel": 21.610748291015625
+      },
+      "test": {
+        "loss": 0.39284028112888336,
+        "top1_ade_pixel": 31.23475742340088,
+        "top1_fde_pixel": 45.153438568115234,
+        "min_ade_pixel": 30.27415370941162,
+        "min_fde_pixel": 23.51862335205078
+      }
+    },
+    "no_velocity": {
+      "best_epoch": 2,
+      "validation": {
+        "epoch": 2,
+        "train_loss": 0.3464968316257,
+        "selection_score": 52.777620792388916,
+        "loss": 0.45615552365779877,
+        "top1_ade_pixel": 28.86888337135315,
+        "top1_fde_pixel": 40.6514048576355,
+        "min_ade_pixel": 23.908737421035767,
+        "min_fde_pixel": 21.103901863098145
+      },
+      "test": {
+        "loss": 0.4533289670944214,
+        "top1_ade_pixel": 28.932684898376465,
+        "top1_fde_pixel": 41.26457977294922,
+        "min_ade_pixel": 23.975316047668457,
+        "min_fde_pixel": 22.697614669799805
+      }
+    },
+    "no_diversity": {
+      "best_epoch": 2,
+      "validation": {
+        "epoch": 2,
+        "train_loss": 0.34829538967460394,
+        "selection_score": 39.68117690086365,
+        "loss": 0.40043192729353905,
+        "top1_ade_pixel": 21.06249976158142,
+        "top1_fde_pixel": 23.73574423789978,
+        "min_ade_pixel": 18.618677139282227,
+        "min_fde_pixel": 21.851444005966187
+      },
+      "test": {
+        "loss": 0.405976802110672,
+        "top1_ade_pixel": 21.645414352416992,
+        "top1_fde_pixel": 25.717370986938477,
+        "min_ade_pixel": 19.10547924041748,
+        "min_fde_pixel": 23.69913673400879
+      }
+    }
+  },
+  "ranking_by_validation_score": [
+    "rank8",
+    "no_diversity",
+    "baseline",
+    "rank32",
+    "no_velocity",
+    "modes3",
+    "modes9"
+  ],
+  "best_variant": "rank8"
+}

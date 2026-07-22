@@ -1,0 +1,16 @@
+{
+  "best_epoch": 2,
+  "validation_initializer_loss": 0.11426535684554304,
+  "validation": {
+    "top1_ade_pixel": 169.2565155029297,
+    "top1_fde_pixel": 182.8279825846354,
+    "min_ade_pixel": 166.7126719156901,
+    "min_fde_pixel": 157.12335713704428
+  },
+  "test": {
+    "top1_ade_pixel": 169.0040486653646,
+    "top1_fde_pixel": 184.6691436767578,
+    "min_ade_pixel": 166.29789225260416,
+    "min_fde_pixel": 159.41505432128906
+  }
+}
